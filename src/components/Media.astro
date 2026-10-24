@@ -1,0 +1,40 @@
+---
+// Muestra un loop de vídeo, una imagen o un fondo provisional si aún no hay material.
+import { hueFrom } from '../lib/projects';
+import { asset } from '../i18n';
+
+interface Props {
+  loop?: string;
+  loopMobile?: string;
+  poster?: string;
+  seed: string;
+  label?: string;
+  class?: string;
+  play?: 'auto' | 'hover'; // auto = siempre en bucle; hover = se reproduce al pasar el ratón
+  eager?: boolean;
+}
+const { loop: l, loopMobile: lm, poster: po, seed, label = '', class: cls = '', play = 'hover', eager = false } = Astro.props;
+const loop = asset(l ?? ''), loopMobile = asset(lm ?? ''), poster = asset(po ?? '');
+---
+<div class:list={['media', cls]} style={`--h:${hueFrom(seed)}`}>
+  {
+    loop ? (
+      <video
+        muted
+        loop
+        playsinline
+        preload={play === 'auto' ? 'auto' : 'metadata'}
+        poster={poster || undefined}
+        autoplay={play === 'auto'}
+        data-play={play}
+      >
+        {loopMobile && <source src={loopMobile} type="video/mp4" media="(max-width: 640px)" />}
+        <source src={loop} type="video/mp4" />
+      </video>
+    ) : poster ? (
+      <img src={poster} alt="" loading={eager ? 'eager' : 'lazy'} decoding="async" />
+    ) : (
+      <div class="media-ph" aria-hidden="true">{label && <span>{label}</span>}</div>
+    )
+  }
+</div>

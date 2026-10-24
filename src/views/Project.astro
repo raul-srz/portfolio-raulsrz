@@ -1,0 +1,120 @@
+---
+import Base from '../layouts/Base.astro';
+import Media from '../components/Media.astro';
+import Arrow from '../components/Arrow.astro';
+import { ui, href, type Lang } from '../i18n';
+import { getProjects, type Project } from '../lib/projects';
+
+interface Props { lang: Lang; project: Project }
+const { lang, project } = Astro.props;
+const t = ui[lang];
+const d = project.data;
+const all = await getProjects();
+const idx = all.findIndex((p) => p.id === project.id);
+const next = all[(idx + 1) % all.length];
+const cats = d.categories.map((c) => t.cats[c]).join(' · ');
+const stills = d.stills.length ? d.stills : ['', '', '', ''];
+---
+<Base lang={lang} title={d.title} description={d.about[lang]}>
+  <section class="p-hero" data-film={d.youtube || undefined}>
+    <Media class="p-media" seed={project.id} loop={d.loop} poster={d.poster} play="auto" eager label={d.title} />
+    <div class="p-over wrap blend">
+      <h1>{d.title}</h1>
+      <span class="small">{cats}</span>
+    </div>
+    {d.youtube && <button class="p-play" data-open-film aria-label={t.playFilm}></button>}
+  </section>
+
+  <section class="about wrap section">
+    <p class="lbl">{t.aboutProject}</p>
+    <p class="about-text">{d.about[lang]}</p>
+  </section>
+
+  <section class="wrap">
+    <dl class="meta">
+      <div><dt class="lbl">{t.role}</dt><dd>{d.role[lang]}</dd></div>
+      <div><dt class="lbl">{t.type}</dt><dd>{d.type[lang]}</dd></div>
+      <div><dt class="lbl">{t.year}</dt><dd>{d.year}</dd></div>
+      {d.client && <div><dt class="lbl">{t.client}</dt><dd>{d.client}</dd></div>}
+    </dl>
+  </section>
+
+  <section class="stills wrap section">
+    {stills.map((s, i) => <Media seed={`${project.id}-${i}`} poster={s} label="Still" />)}
+  </section>
+
+  {
+    d.credits.length > 0 && (
+      <section class="credits wrap">
+        <h2 class="sec">{t.credits}</h2>
+        <dl>
+          {d.credits.map((c) => (
+            <div><dt class="muted">{c.role}</dt><dd>{c.name}</dd></div>
+          ))}
+        </dl>
+      </section>
+    )
+  }
+
+  {
+    next && next.id !== project.id && (
+      <section class="next wrap section">
+        <p class="lbl">{t.nextProject}</p>
+        <a class="next-link" href={href(lang, `/work/${next.id}`)}>{next.data.title}<Arrow /></a>
+      </section>
+    )
+  }
+
+  {
+    d.youtube && (
+      <div class="film" data-film-box hidden>
+        <button class="film-close small" data-close-film>{t.closeFilm}</button>
+        <div class="film-frame" data-film-frame />
+      </div>
+    )
+  }
+</Base>
+
+<style>
+  .p-hero { position: relative; height: 100svh; min-height: 480px; max-height: 1100px; }
+  .p-hero :global(.p-media) { position: absolute; inset: 0; }
+  .p-over { position: absolute; left: 0; right: 0; bottom: clamp(20px, 3vw, 40px); display: flex; justify-content: space-between; align-items: baseline; gap: 16px; pointer-events: none; z-index: 2; }
+  .p-over h1 { margin: 0; font-size: clamp(48px, 9vw, 160px); font-weight: 400; letter-spacing: -0.045em; line-height: 0.9; min-width: 0; }
+  .p-over span { white-space: nowrap; }
+  .p-play { position: absolute; inset: 0; z-index: 1; }
+
+  .about { display: grid; gap: 20px; }
+  .about p { margin: 0; }
+  .about-text { font-size: clamp(30px, 5.4vw, 92px); font-weight: 400; letter-spacing: -0.035em; line-height: 1.04; }
+
+  .meta { display: grid; grid-template-columns: repeat(4, minmax(0, 1fr)); gap: 24px; margin: 0; border-top: 1px solid var(--line); padding-top: 20px; }
+  .meta dt { margin-bottom: 6px; }
+  .meta dd { margin: 0; font-size: 18px; }
+
+  .stills { display: grid; grid-template-columns: repeat(6, minmax(0, 1fr)); gap: 16px; }
+  .stills :global(.media:nth-child(4n + 1)) { grid-column: span 4; aspect-ratio: 16 / 9; }
+  .stills :global(.media:nth-child(4n + 2)) { grid-column: span 2; aspect-ratio: 4 / 5; }
+  .stills :global(.media:nth-child(4n + 3)), .stills :global(.media:nth-child(4n + 4)) { grid-column: span 3; aspect-ratio: 3 / 2; }
+
+  .sec { margin: 0 0 24px; padding-bottom: 12px; border-bottom: 1px solid var(--line); font-size: clamp(24px, 2.4vw, 34px); font-weight: 400; letter-spacing: -0.02em; }
+  .credits dl { margin: 0; display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 12px 32px; }
+  .credits dl div { display: flex; justify-content: space-between; gap: 12px; padding-bottom: 8px; border-bottom: 1px solid var(--line); }
+  .credits dd { margin: 0; text-align: right; }
+
+  .next { display: grid; gap: 16px; }
+  .next p { margin: 0; }
+  .next-link { display: inline-flex; align-items: center; gap: 0.18em; font-size: clamp(44px, 8vw, 130px); font-weight: 400; letter-spacing: -0.045em; line-height: 0.95; }
+  .next-link:hover :global(.arrow) { transform: translateX(0.12em); }
+
+  .film { position: fixed; inset: 0; z-index: 200; background: #000; display: grid; place-items: center; padding: 64px var(--gutr) 24px var(--gut); }
+  .film[hidden] { display: none; }
+  .film-close { position: absolute; top: calc(env(safe-area-inset-top, 0px) + 20px); right: var(--gutr); }
+  .film-frame { width: 100%; max-width: calc((100svh - 120px) * 16 / 9); aspect-ratio: 16 / 9; }
+  .film-frame :global(iframe) { width: 100%; height: 100%; border: 0; }
+
+  @media (max-width: 760px) {
+    .meta { grid-template-columns: repeat(2, minmax(0, 1fr)); }
+    .stills :global(.media) { grid-column: span 6 !important; aspect-ratio: 4 / 3 !important; }
+    .credits dl { grid-template-columns: 1fr; }
+  }
+</style>

@@ -1,0 +1,111 @@
+---
+import Base from '../layouts/Base.astro';
+import Media from '../components/Media.astro';
+import Arrow from '../components/Arrow.astro';
+import { ui, href, type Lang } from '../i18n';
+import { getProjects } from '../lib/projects';
+
+interface Props { lang: Lang }
+const { lang } = Astro.props;
+const t = ui[lang];
+const projects = await getProjects();
+const cats = ['ai', 'commercial', 'motion'] as const;
+const count = (c: string) => projects.filter((p) => (p.data.categories as string[]).includes(c)).length;
+const years = [...new Set(projects.map((p) => p.data.year))];
+---
+<Base lang={lang} title={t.work}>
+  <div class="work" data-work>
+    <div class="top wrap">
+      <h1 class="visually-hidden">{t.work}</h1>
+      <div class="filters" role="group" aria-label="Filter">
+        <button class="on" data-filter="all" aria-pressed="true">{t.all}<sup>{projects.length}</sup></button>
+        {cats.filter((c) => count(c) > 0).map((c) => (
+          <button data-filter={c} aria-pressed="false">{t.cats[c]}<sup>{count(c)}</sup></button>
+        ))}
+      </div>
+      <div class="views" role="group" aria-label="View">
+        <button class="on" data-view="grid" aria-pressed="true">{t.grid}</button>
+        <button data-view="list" aria-pressed="false">{t.list}</button>
+      </div>
+    </div>
+
+    <ol class="years small" data-years aria-hidden="true">
+      {years.map((y) => <li data-year={y}>{y}</li>)}
+    </ol>
+
+    <div class="grid wrap" data-grid>
+      {projects.map((p, i) => (
+        <a class="card" data-slot={i % 6} href={href(lang, `/work/${p.id}`)} data-cats={p.data.categories.join(' ')} data-year={p.data.year}>
+          <Media seed={p.id} loop={p.data.loop} poster={p.data.poster} play="hover" label={p.data.title} />
+          <span class="card-info">
+            <span>{p.data.title}</span>
+            <span class="small muted">{p.data.year}</span>
+          </span>
+        </a>
+      ))}
+    </div>
+
+    <ul class="list wrap" data-list hidden>
+      {projects.map((p) => (
+        <li data-cats={p.data.categories.join(' ')}>
+          <a class="row" href={href(lang, `/work/${p.id}`)}>
+            <span class="row-title">{p.data.title}</span>
+            <span class="row-cat small muted">{p.data.categories.map((c) => t.cats[c]).join(' · ')}</span>
+            <span class="row-year small muted">{p.data.year}</span>
+            <Arrow />
+          </a>
+        </li>
+      ))}
+    </ul>
+  </div>
+</Base>
+
+<style>
+  .top { padding-top: clamp(100px, 12vw, 160px); display: flex; justify-content: space-between; align-items: flex-end; gap: 24px; flex-wrap: wrap; }
+  .filters, .views { display: flex; flex-wrap: wrap; gap: clamp(12px, 2vw, 30px); }
+  .filters button, .views button {
+    font-size: clamp(30px, 4.8vw, 72px); font-weight: 400; letter-spacing: -0.04em; line-height: 1;
+    color: var(--dim); transition: color 0.3s;
+  }
+  .filters button:hover, .views button:hover { color: var(--muted); }
+  .filters button.on, .views button.on { color: var(--fg); }
+  sup { font-size: 11px; letter-spacing: 0; vertical-align: top; margin-left: 3px; }
+
+  .years { position: fixed; left: var(--gut); top: 50%; transform: translateY(-50%); z-index: 5; list-style: none; margin: 0; padding: 0; display: grid; gap: 4px; }
+  .years li { color: var(--dim); transition: color 0.3s; }
+  .years li.on { color: var(--fg); }
+
+  .grid {
+    display: grid; grid-template-columns: repeat(12, minmax(0, 1fr)); column-gap: 16px; row-gap: clamp(56px, 9vw, 150px);
+    padding-top: clamp(48px, 7vw, 100px); padding-bottom: clamp(100px, 12vw, 180px);
+  }
+  .card { display: grid; gap: 10px; align-content: start; }
+  .card[hidden] { display: none; }
+  .card :global(.media) { aspect-ratio: var(--ar, 4 / 5); transition: opacity 0.4s; }
+  .card-info { display: flex; justify-content: space-between; gap: 12px; }
+  .card[data-slot="0"] { grid-column: 2 / span 4; }
+  .card[data-slot="1"] { grid-column: 8 / span 4; margin-top: 16vw; --ar: 16 / 9; }
+  .card[data-slot="2"] { grid-column: 4 / span 5; --ar: 16 / 9; }
+  .card[data-slot="3"] { grid-column: 10 / span 3; }
+  .card[data-slot="4"] { grid-column: 2 / span 4; --ar: 1 / 1; }
+  .card[data-slot="5"] { grid-column: 7 / span 6; margin-top: 10vw; --ar: 21 / 9; }
+
+  .list { list-style: none; margin: 0; padding-top: 40px; padding-bottom: clamp(100px, 12vw, 180px); }
+  .list li[hidden] { display: none; }
+  .row {
+    display: grid; grid-template-columns: minmax(0, 3fr) minmax(0, 2fr) minmax(0, 1fr) 28px; gap: 16px; align-items: center;
+    padding-block: 20px; border-top: 1px solid var(--line);
+  }
+  .list li:last-child .row { border-bottom: 1px solid var(--line); }
+  .row-title { font-size: clamp(22px, 2.6vw, 34px); letter-spacing: -0.02em; transition: transform 0.4s var(--ease); }
+  .row:hover .row-title { transform: translateX(10px); }
+  .row :global(.arrow) { width: 22px; height: 22px; }
+
+  @media (max-width: 760px) {
+    .years { display: none; }
+    .grid { display: flex; flex-direction: column; gap: 48px; }
+    .card { margin-top: 0 !important; }
+    .row { grid-template-columns: minmax(0, 1fr) auto; }
+    .row-cat, .row-year { display: none; }
+  }
+</style>

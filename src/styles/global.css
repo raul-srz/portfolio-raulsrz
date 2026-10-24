@@ -1,0 +1,91 @@
+@import '@fontsource/roboto/300.css';
+@import '@fontsource/roboto/400.css';
+@import '@fontsource/roboto/500.css';
+
+/* Sistema: negro casi puro, blanco roto, dos grises. Roboto en todo.
+   Los textos sobre vídeo y el cursor usan mix-blend-mode: difference. */
+:root {
+  --bg: #0a0a0a;
+  --fg: #f2f2ef;
+  --muted: #8b8b88;
+  --dim: #4a4a48;
+  --line: #262625;
+  --font: 'Roboto', 'Helvetica Neue', Helvetica, Arial, sans-serif;
+  --gut: max(16px, env(safe-area-inset-left, 0px), 2.2vw);
+  --gutr: max(16px, env(safe-area-inset-right, 0px), 2.2vw);
+  --ease: cubic-bezier(0.2, 0.8, 0.2, 1);
+  color-scheme: dark;
+}
+
+*,
+*::before,
+*::after { box-sizing: border-box; }
+html { -webkit-text-size-adjust: 100%; }
+body {
+  margin: 0;
+  background: var(--bg);
+  color: var(--fg);
+  font-family: var(--font);
+  font-size: 16px;
+  line-height: 1.45;
+  -webkit-font-smoothing: antialiased;
+  overflow-x: hidden;
+}
+a { color: inherit; text-decoration: none; }
+button { font: inherit; color: inherit; background: none; border: 0; padding: 0; cursor: pointer; }
+img, video { display: block; max-width: 100%; }
+:focus-visible { outline: 1px solid var(--fg); outline-offset: 3px; }
+::selection { background: var(--fg); color: var(--bg); }
+
+.wrap { padding-left: var(--gut); padding-right: var(--gutr); }
+.lbl { font-size: 12px; letter-spacing: 0.07em; text-transform: uppercase; color: var(--muted); }
+.small { font-size: 12px; letter-spacing: 0.06em; text-transform: uppercase; }
+.muted { color: var(--muted); }
+.section { padding-block: clamp(80px, 11vw, 160px); }
+.visually-hidden { position: absolute !important; width: 1px; height: 1px; overflow: hidden; clip: rect(0 0 0 0); white-space: nowrap; }
+
+/* Flecha única de la web */
+.arrow { width: 0.72em; height: 0.72em; flex: none; stroke: currentColor; stroke-width: 1.4; fill: none; transition: transform 0.35s var(--ease); }
+
+/* Texto sobre vídeo en negativo */
+.blend { mix-blend-mode: difference; color: #fff; }
+
+/* Media: vídeo, imagen o fondo provisional */
+.media { position: relative; overflow: hidden; background: #141413; }
+.media video, .media img { width: 100%; height: 100%; object-fit: cover; }
+.media-ph {
+  position: absolute; inset: 0;
+  background:
+    radial-gradient(60% 80% at 30% 35%, hsl(var(--h) 35% 38%), transparent 70%),
+    radial-gradient(50% 70% at 75% 70%, hsl(calc(var(--h) + 40) 30% 22%), transparent 70%),
+    linear-gradient(105deg, transparent 52%, hsl(var(--h) 15% 78% / 0.85) 52% 64%, transparent 64%),
+    #121211;
+  background-size: 160% 160%, 160% 160%, 100% 100%, auto;
+  animation: ph-drift 14s ease-in-out infinite alternate;
+}
+.media-ph span {
+  position: absolute; left: 50%; top: 50%; transform: translate(-50%, -50%);
+  font-size: 10px; letter-spacing: 0.1em; text-transform: uppercase; color: rgba(255, 255, 255, 0.45); white-space: nowrap;
+}
+@keyframes ph-drift {
+  to { background-position: 100% 60%, 0% 40%, 0 0, 0 0; }
+}
+
+/* Cursor en negativo (solo ratón) */
+.cursor { position: fixed; left: 0; top: 0; z-index: 9999; pointer-events: none; mix-blend-mode: difference; opacity: 0; transition: opacity 0.2s; }
+.cursor.on { opacity: 1; }
+.cursor i {
+  display: grid; place-items: center; width: 20px; height: 20px; margin: -10px 0 0 -10px; border-radius: 50%;
+  background: #fff; color: #000; transition: transform 0.4s var(--ease);
+}
+.cursor b { font-size: 3px; font-weight: 500; letter-spacing: 0.06em; text-transform: uppercase; opacity: 0; transition: opacity 0.2s; white-space: nowrap; }
+.cursor.big i { transform: scale(3.2); }
+.cursor.label i { transform: scale(5); }
+.cursor.label b { opacity: 1; }
+.cursor.press i { transform: scale(0.7); }
+.cursor.big.press i { transform: scale(2.6); }
+.has-cursor, .has-cursor * { cursor: none !important; }
+
+@media (prefers-reduced-motion: reduce) {
+  *, *::before, *::after { animation: none !important; transition: none !important; scroll-behavior: auto !important; }
+}

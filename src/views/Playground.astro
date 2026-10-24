@@ -1,0 +1,33 @@
+---
+import Base from '../layouts/Base.astro';
+import { ui, asset, type Lang } from '../i18n';
+
+// Piezas del playground: rutas en /public (jpg, png, gif o mp4). Vacío = piezas provisionales.
+const items: string[] = ([] as string[]).map(asset);
+
+interface Props { lang: Lang }
+const { lang } = Astro.props;
+const t = ui[lang];
+---
+<Base lang={lang} title="Playground" footer={false} noindex>
+  <h1 class="visually-hidden">Playground</h1>
+  <div class="pg" data-pg data-items={JSON.stringify(items)}>
+    <div class="layer" data-layer></div>
+  </div>
+  <div class="ui blend" aria-hidden="true">
+    <span class="title">{t.lookAround}</span>
+    <span class="hint small">{t.drag}</span>
+  </div>
+</Base>
+
+<style>
+  .pg { position: relative; height: 100svh; overflow: hidden; touch-action: none; user-select: none; -webkit-user-select: none; }
+  .layer { position: absolute; left: 0; top: 0; transform-origin: 0 0; will-change: transform; }
+  .pg :global(.pg-item) { position: absolute; display: grid; gap: 6px; }
+  .pg :global(.pg-item .media) { width: 100%; }
+  .pg :global(.pg-item img), .pg :global(.pg-item video) { width: 100%; height: 100%; object-fit: cover; pointer-events: none; }
+  .pg :global(.pg-item small) { font-size: 10px; letter-spacing: 0.08em; text-transform: uppercase; color: var(--muted); }
+  .ui { position: fixed; inset: 0; pointer-events: none; z-index: 10; }
+  .title { position: absolute; left: 50%; top: 50%; transform: translate(-50%, -50%); font-size: clamp(48px, 10vw, 170px); letter-spacing: -0.045em; line-height: 0.9; white-space: nowrap; }
+  .hint { position: absolute; left: 50%; transform: translateX(-50%); bottom: calc(env(safe-area-inset-bottom, 0px) + 24px); }
+</style>

@@ -1,0 +1,109 @@
+---
+import '../styles/global.css';
+import { site } from '../site';
+import { ui, href, basePath, asset, type Lang } from '../i18n';
+import Footer from '../components/Footer.astro';
+
+interface Props {
+  lang: Lang;
+  title?: string;
+  description?: string;
+  footer?: boolean;
+  noindex?: boolean;
+}
+const { lang, title, description, footer = true, noindex = false } = Astro.props;
+const t = ui[lang];
+const fullTitle = title ? `${title} — ${site.name}` : `${site.name} — ${site.role}`;
+const desc = description ?? t.metaDescription;
+const path = basePath(Astro.url.pathname);
+const enUrl = new URL(href('en', path), Astro.site);
+const esUrl = new URL(href('es', path), Astro.site);
+const current = path === '/' ? 'home' : path.startsWith('/work') ? 'work' : path.startsWith('/about') ? 'about' : '';
+---
+<!doctype html>
+<html lang={lang}>
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover" />
+    <title>{fullTitle}</title>
+    <meta name="description" content={desc} />
+    <meta name="theme-color" content="#0a0a0a" />
+    <link rel="canonical" href={lang === 'en' ? enUrl : esUrl} />
+    <link rel="alternate" hreflang="en" href={enUrl} />
+    <link rel="alternate" hreflang="es" href={esUrl} />
+    <link rel="alternate" hreflang="x-default" href={enUrl} />
+    <meta property="og:title" content={fullTitle} />
+    <meta property="og:description" content={desc} />
+    <meta property="og:type" content="website" />
+    <meta property="og:url" content={lang === 'en' ? enUrl : esUrl} />
+    <meta name="twitter:card" content="summary_large_image" />
+    <link rel="icon" href={asset('/favicon.svg')} type="image/svg+xml" />
+    {noindex && <meta name="robots" content="noindex" />}
+  </head>
+  <body>
+    <a class="skip visually-hidden" href="#main">Skip to content</a>
+    <header class="site-header wrap">
+      <a class="logo" href={href(lang, '/')}>{site.name}</a>
+      <nav class="nav" aria-label="Main">
+        <div class="nav-links" id="navLinks">
+          <a href={href(lang, '/work')} aria-current={current === 'work' ? 'page' : undefined}>{t.work}</a>
+          <a href={href(lang, '/about')} aria-current={current === 'about' ? 'page' : undefined}>{t.about}</a>
+        </div>
+        <div class="lang small">
+          <a href={href('en', path)} class:list={{ on: lang === 'en' }} hreflang="en" lang="en">EN</a>
+          <span aria-hidden="true">/</span>
+          <a href={href('es', path)} class:list={{ on: lang === 'es' }} hreflang="es" lang="es">ES</a>
+        </div>
+        <button class="menu-btn small" id="menuBtn" aria-expanded="false" aria-controls="navLinks" data-open={t.menu} data-close={t.close}>{t.menu}</button>
+      </nav>
+    </header>
+
+    <main id="main">
+      <slot />
+    </main>
+
+    {footer && <Footer lang={lang} />}
+
+    <div class="cursor" id="cursor" aria-hidden="true"><i><b data-reel={t.watchReel}></b></i></div>
+
+    <script>
+      import '../scripts/main.ts';
+    </script>
+  </body>
+</html>
+
+<style>
+  .site-header {
+    position: fixed; inset: 0 0 auto; z-index: 50;
+    padding-top: calc(env(safe-area-inset-top, 0px) + 18px); padding-bottom: 18px;
+    display: flex; justify-content: space-between; align-items: center; gap: 16px;
+    mix-blend-mode: difference; color: #fff;
+  }
+  .logo { font-size: 17px; font-weight: 500; letter-spacing: -0.01em; }
+  .nav { display: flex; align-items: center; gap: 28px; }
+  .nav-links { display: flex; gap: 28px; }
+  .nav-links a { position: relative; }
+  .nav-links a::after {
+    content: ''; position: absolute; left: 0; right: 0; bottom: -3px; height: 1px; background: currentColor;
+    transform: scaleX(0); transform-origin: right; transition: transform 0.4s var(--ease);
+  }
+  .nav-links a:hover::after, .nav-links a[aria-current='page']::after { transform: scaleX(1); transform-origin: left; }
+  .lang { display: flex; gap: 6px; }
+  .lang a { opacity: 0.45; transition: opacity 0.2s; }
+  .lang a.on, .lang a:hover { opacity: 1; }
+  .menu-btn { display: none; }
+  .skip:focus { position: fixed !important; left: 16px; top: 16px; width: auto; height: auto; clip: auto; z-index: 100; background: var(--fg); color: var(--bg); padding: 8px 12px; }
+
+  @media (max-width: 640px) {
+    .nav { gap: 18px; }
+    .menu-btn { display: inline; position: relative; z-index: 2; }
+    .nav-links {
+      position: fixed; inset: 0; z-index: 1; flex-direction: column; justify-content: center; gap: 8px;
+      padding: 0 var(--gutr) 0 var(--gut); background: #000; color: #fff;
+      font-size: clamp(48px, 15vw, 72px); letter-spacing: -0.035em; line-height: 1;
+      opacity: 0; visibility: hidden; transition: opacity 0.3s, visibility 0.3s;
+    }
+    :global(body.menu-open) .nav-links { opacity: 1; visibility: visible; }
+    .nav-links a::after { display: none; }
+  }
+</style>

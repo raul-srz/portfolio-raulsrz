@@ -1,0 +1,65 @@
+---
+import { site } from '../site';
+import { ui, href, type Lang } from '../i18n';
+interface Props { lang: Lang }
+const { lang } = Astro.props;
+const t = ui[lang];
+const socials = site.socials.filter((s) => s.url);
+const reps = Array.from({ length: 6 });
+---
+<footer class="footer">
+  <div class="cols wrap">
+    <div>
+      <h2 class="lbl">{t.contact}</h2>
+      <a class="link" href={`mailto:${site.email}`}>{site.email}</a>
+    </div>
+    <div>
+      <h2 class="lbl">{t.socials}</h2>
+      <ul>
+        {socials.map((s) => <li><a class="link" href={s.url} target="_blank" rel="noopener">{s.label} ↗</a></li>)}
+      </ul>
+    </div>
+    <div>
+      <h2 class="lbl">{site.location}</h2>
+      <p class="clock" data-clock={site.timezone}>--:--:--</p>
+    </div>
+    <div>
+      <h2 class="lbl">{t.menu}</h2>
+      <ul>
+        <li><a class="link" href={href(lang, '/work')}>{t.work}</a></li>
+        <li><a class="link" href={href(lang, '/about')}>{t.about}</a></li>
+        <li>
+          {site.playground ? (
+            <a class="link" href={href(lang, '/playground')}>Playground</a>
+          ) : (
+            <span class="muted">Playground · {t.soon}</span>
+          )}
+        </li>
+      </ul>
+    </div>
+  </div>
+  <div class="marquee" aria-label={site.name}>
+    <div class="track" aria-hidden="true">
+      {reps.map(() => <span>{site.name}</span>)}
+    </div>
+  </div>
+  <p class="copy wrap small muted">© {new Date().getFullYear()} {site.name}</p>
+</footer>
+
+<style>
+  .footer { border-top: 1px solid var(--line); padding-top: 48px; padding-bottom: calc(env(safe-area-inset-bottom, 0px) + 24px); }
+  .cols { display: grid; grid-template-columns: repeat(4, minmax(0, 1fr)); gap: 32px; }
+  h2 { margin: 0 0 12px; font-weight: 400; }
+  ul { list-style: none; margin: 0; padding: 0; display: grid; gap: 4px; }
+  p { margin: 0; }
+  .clock { font-variant-numeric: tabular-nums; }
+  .link { transition: opacity 0.2s; }
+  .link:hover { opacity: 0.6; }
+  .marquee { margin-top: 64px; overflow: hidden; white-space: nowrap; }
+  .track { display: inline-flex; animation: marquee 30s linear infinite; }
+  .track span { font-size: clamp(64px, 15vw, 240px); font-weight: 400; letter-spacing: -0.05em; line-height: 0.9; padding-right: 0.35em; }
+  .marquee:hover .track { animation-play-state: paused; }
+  @keyframes marquee { to { transform: translateX(-50%); } }
+  .copy { margin-top: 24px; }
+  @media (max-width: 760px) { .cols { grid-template-columns: repeat(2, minmax(0, 1fr)); } }
+</style>

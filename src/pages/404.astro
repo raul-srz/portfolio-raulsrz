@@ -1,0 +1,16 @@
+---
+import Base from '../layouts/Base.astro';
+import { href } from '../i18n';
+---
+<Base lang="en" title="Not found" noindex>
+  <section class="nf wrap">
+    <p class="lbl">404</p>
+    <h1>This frame doesn't exist.</h1>
+    <a href={href('en', '/')}>Back home →</a>
+  </section>
+</Base>
+<style>
+  .nf { min-height: 80svh; display: grid; align-content: center; gap: 20px; padding-top: 120px; }
+  .nf p { margin: 0; }
+  h1 { margin: 0; font-size: clamp(40px, 8vw, 130px); font-weight: 400; letter-spacing: -0.045em; line-height: 0.95; }
+</style>

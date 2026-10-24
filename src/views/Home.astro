@@ -1,0 +1,111 @@
+---
+import Base from '../layouts/Base.astro';
+import Media from '../components/Media.astro';
+import Arrow from '../components/Arrow.astro';
+import { site } from '../site';
+import { ui, href, type Lang } from '../i18n';
+import { getFeatured } from '../lib/projects';
+
+interface Props { lang: Lang }
+const { lang } = Astro.props;
+const t = ui[lang];
+const featured = await getFeatured();
+const words = t.statement.split(' ');
+---
+<Base lang={lang}>
+  <section class="hero" data-reel={site.reel || undefined}>
+    <Media
+      class="hero-media"
+      seed="hero"
+      loop={site.hero.loop}
+      loopMobile={site.hero.loopMobile}
+      poster={site.hero.poster}
+      play="auto"
+      eager
+      label="Hero loop"
+    />
+    <div class="hero-over wrap blend">
+      <h1>{site.role}</h1>
+    </div>
+  </section>
+
+  <section class="statement wrap section">
+    <p class="lbl">{t.behind}</p>
+    <p class="statement-text" data-statement>
+      {words.map((w, i) => <><span class="w">{w}</span>{i < words.length - 1 ? ' ' : ''}</>)}
+    </p>
+  </section>
+
+  {
+    featured.length > 0 && (
+      <section class="selected wrap" aria-labelledby="selected-title">
+        <h2 id="selected-title" class="sec-title">{t.selected}</h2>
+        <div class="carousel" data-carousel>
+          <button class="arr l" data-prev aria-label={t.prev}><Arrow dir="left" /></button>
+          <button class="arr r" data-next aria-label={t.next}><Arrow /></button>
+          <div class="track" data-track>
+            {featured.map((p, i) => (
+              <a class="slide" href={href(lang, `/work/${p.id}`)} aria-label={p.data.title}>
+                <Media seed={p.id} loop={p.data.loop} poster={p.data.poster} play="hover" label={p.data.title} eager={i === 0} />
+                <div class="slide-over blend">
+                  <h3>{p.data.title}</h3>
+                  <span class="small">{p.data.categories.map((c) => t.cats[c]).join(' · ')}</span>
+                </div>
+              </a>
+            ))}
+          </div>
+        </div>
+      </section>
+    )
+  }
+
+  <section class="cta wrap section">
+    <a class="cta-link" href={href(lang, '/work')}>{t.allWork}<Arrow /></a>
+  </section>
+</Base>
+
+<style>
+  .hero { position: relative; height: 100svh; min-height: 520px; max-height: 1100px; }
+  .hero :global(.hero-media) { position: absolute; inset: 0; }
+  .hero-over { position: absolute; left: 0; right: 0; bottom: clamp(20px, 3vw, 40px); }
+  .hero h1 { margin: 0; font-size: clamp(52px, 11.5vw, 210px); font-weight: 400; letter-spacing: -0.045em; line-height: 0.85; }
+
+  .statement { display: grid; gap: 20px; }
+  .statement p { margin: 0; }
+  .statement-text { font-size: clamp(30px, 5.4vw, 84px); font-weight: 400; letter-spacing: -0.03em; line-height: 1.04; max-width: 22ch; text-wrap: balance; }
+  .statement-text .w { color: var(--dim); transition: color 0.35s; }
+  .statement-text .w.lit { color: var(--fg); }
+
+  .sec-title { margin: 0 0 24px; font-size: clamp(28px, 4vw, 52px); font-weight: 400; letter-spacing: -0.03em; }
+  .carousel { position: relative; }
+  .track { display: flex; overflow-x: auto; scroll-snap-type: x mandatory; scrollbar-width: none; overscroll-behavior-x: contain; }
+  .track::-webkit-scrollbar { display: none; }
+  .slide { position: relative; flex: 0 0 100%; scroll-snap-align: start; display: block; }
+  .slide :global(.media) { aspect-ratio: 21 / 9; }
+  .slide-over {
+    position: absolute; left: clamp(16px, 2.5vw, 36px); right: clamp(16px, 2.5vw, 36px); bottom: clamp(16px, 2.5vw, 32px);
+    display: flex; justify-content: space-between; align-items: baseline; gap: 16px; pointer-events: none;
+  }
+  .slide-over h3 { margin: 0; font-size: clamp(20px, 2.4vw, 34px); font-weight: 400; letter-spacing: -0.015em; line-height: 1.1; min-width: 0; }
+  .slide-over span { white-space: nowrap; }
+  .arr {
+    position: absolute; top: 50%; z-index: 3; transform: translateY(-50%);
+    width: clamp(44px, 5vw, 64px); aspect-ratio: 1; display: grid; place-items: center;
+    border: 1px solid rgba(255, 255, 255, 0.6); color: #fff; mix-blend-mode: difference;
+    transition: opacity 0.3s, background-color 0.3s;
+  }
+  .arr :global(.arrow) { width: 42%; height: 42%; }
+  .arr:hover { background: rgba(255, 255, 255, 0.15); }
+  .arr:disabled { opacity: 0; pointer-events: none; }
+  .arr.l { left: clamp(12px, 2vw, 28px); }
+  .arr.r { right: clamp(12px, 2vw, 28px); }
+
+  .cta { display: flex; justify-content: center; }
+  .cta-link { display: inline-flex; align-items: center; gap: 0.18em; font-size: clamp(48px, 10vw, 160px); font-weight: 400; letter-spacing: -0.05em; line-height: 0.9; }
+  .cta-link:hover :global(.arrow) { transform: translateX(0.12em); }
+
+  @media (max-width: 640px) {
+    .slide :global(.media) { aspect-ratio: 4 / 5; }
+    .arr { top: auto; bottom: 64px; transform: none; }
+  }
+</style>
