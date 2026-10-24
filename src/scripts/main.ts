@@ -6,6 +6,12 @@ const finePointer = mm('(hover: hover) and (pointer: fine)');
 const $ = <T extends Element = HTMLElement>(s: string, r: ParentNode = document) => r.querySelector<T>(s) as T | null;
 const $$ = <T extends Element = HTMLElement>(s: string, r: ParentNode = document) => [...r.querySelectorAll<T>(s)];
 
+/* En construcción: bloquear la web de debajo */
+if (document.documentElement.classList.contains('uc')) {
+  $$('.site-header, #main, .footer, .skip').forEach((el) => el.setAttribute('inert', ''));
+  $$<HTMLVideoElement>('#main video').forEach((v) => v.pause());
+}
+
 /* Menú móvil */
 const menuBtn = $<HTMLButtonElement>('#menuBtn');
 menuBtn?.addEventListener('click', () => {

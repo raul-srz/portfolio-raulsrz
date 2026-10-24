@@ -1,0 +1,54 @@
+---
+// Pantalla "en construcción" por encima de toda la web.
+// Se activa con site.underConstruction = true en src/site.ts.
+// Para ver la web real: entra una vez en raulsrz.com/?preview (se recuerda en ese navegador).
+// Para volver a ver esta pantalla: raulsrz.com/?preview=off
+import { site } from '../site';
+import { ui, type Lang } from '../i18n';
+interface Props { lang: Lang }
+const { lang } = Astro.props;
+const t = ui[lang];
+const instagram = site.socials.find((s) => s.label === 'Instagram' && s.url);
+---
+<div class="uc-screen" role="region" aria-label={t.ucTitle}>
+  <p class="uc-name">{site.name}</p>
+  <h1 class="uc-title">{t.ucTitle}</h1>
+  <div class="uc-foot">
+    <p class="lbl">{t.ucText}</p>
+    <div class="uc-links">
+      <a href={`mailto:${site.email}`}>{site.email}</a>
+      {instagram && <a href={instagram.url} target="_blank" rel="noopener">Instagram ↗</a>}
+    </div>
+    <p class="uc-clock small muted"><span>{site.location}</span> <span data-clock={site.timezone}>--:--:--</span></p>
+  </div>
+</div>
+
+<style>
+  .uc-screen {
+    display: none;
+    position: fixed; inset: 0; z-index: 1000;
+    background: var(--bg); color: var(--fg);
+    padding: calc(env(safe-area-inset-top, 0px) + 18px) var(--gutr) calc(env(safe-area-inset-bottom, 0px) + 24px) var(--gut);
+    grid-template-rows: auto 1fr auto; gap: 24px;
+  }
+  :global(html.uc) .uc-screen { display: grid; }
+  :global(html.uc body) { overflow: hidden; }
+  p { margin: 0; }
+  .uc-name { font-size: 17px; font-weight: 500; letter-spacing: -0.01em; }
+  .uc-title {
+    align-self: center; margin: 0; max-width: 12ch;
+    font-size: clamp(56px, 12vw, 220px); font-weight: 400; letter-spacing: -0.05em; line-height: 0.88;
+    animation: uc-in 1.2s var(--ease) both;
+  }
+  .uc-foot { display: grid; grid-template-columns: minmax(0, 1fr) auto; align-items: end; gap: 12px 24px; }
+  .uc-foot .lbl { grid-column: 1 / -1; }
+  .uc-links { display: flex; flex-wrap: wrap; gap: 8px 28px; font-size: clamp(20px, 2.4vw, 32px); letter-spacing: -0.02em; }
+  .uc-links a { transition: opacity 0.2s; }
+  .uc-links a:hover { opacity: 0.6; }
+  .uc-clock { font-variant-numeric: tabular-nums; text-align: right; }
+  @keyframes uc-in { from { opacity: 0; transform: translateY(0.15em); } }
+  @media (max-width: 640px) {
+    .uc-foot { grid-template-columns: 1fr; }
+    .uc-clock { text-align: left; }
+  }
+</style>

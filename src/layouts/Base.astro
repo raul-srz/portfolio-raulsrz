@@ -3,6 +3,7 @@ import '../styles/global.css';
 import { site } from '../site';
 import { ui, href, basePath, asset, type Lang } from '../i18n';
 import Footer from '../components/Footer.astro';
+import UnderConstruction from '../components/UnderConstruction.astro';
 
 interface Props {
   lang: Lang;
@@ -38,7 +39,16 @@ const current = path === '/' ? 'home' : path.startsWith('/work') ? 'work' : path
     <meta property="og:url" content={lang === 'en' ? enUrl : esUrl} />
     <meta name="twitter:card" content="summary_large_image" />
     <link rel="icon" href={asset('/favicon.svg')} type="image/svg+xml" />
-    {noindex && <meta name="robots" content="noindex" />}
+    {(noindex || site.underConstruction) && <meta name="robots" content="noindex" />}
+    {site.underConstruction && (
+      <script is:inline>
+        try {
+          var q = new URLSearchParams(location.search);
+          if (q.has('preview')) q.get('preview') === 'off' ? localStorage.removeItem('rs-preview') : localStorage.setItem('rs-preview', '1');
+          if (!localStorage.getItem('rs-preview')) document.documentElement.classList.add('uc');
+        } catch (e) { document.documentElement.classList.add('uc'); }
+      </script>
+    )}
   </head>
   <body>
     <a class="skip visually-hidden" href="#main">Skip to content</a>
@@ -63,6 +73,8 @@ const current = path === '/' ? 'home' : path.startsWith('/work') ? 'work' : path
     </main>
 
     {footer && <Footer lang={lang} />}
+
+    {site.underConstruction && <UnderConstruction lang={lang} />}
 
     <div class="cursor" id="cursor" aria-hidden="true"><i><b data-reel={t.watchReel}></b></i></div>
 

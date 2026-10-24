@@ -46,6 +46,8 @@ export const ui = {
     drag: 'Drag to explore',
     watchReel: 'Watch reel',
     view: 'View',
+    ucTitle: 'New site in progress',
+    ucText: 'Meanwhile, say hi',
     cats: { ai: 'AI Film', commercial: 'Commercial', motion: 'Motion' },
   },
   es: {
@@ -92,6 +94,8 @@ export const ui = {
     drag: 'Arrastra para explorar',
     watchReel: 'Ver reel',
     view: 'Ver',
+    ucTitle: 'Web nueva en camino',
+    ucText: 'Mientras tanto, escríbeme',
     cats: { ai: 'AI Film', commercial: 'Commercial', motion: 'Motion' },
   },
 } as const;

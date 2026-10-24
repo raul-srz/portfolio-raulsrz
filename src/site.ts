@@ -32,6 +32,9 @@ export const site = {
     { title: 'Festival name (City, Country)', detail: 'Month Year · Project · Award' },
   ],
 
+  // Pantalla "en construcción" por encima de toda la web. Ver la web real: raulsrz.com/?preview
+  underConstruction: true,
+
   // Playground: false = oculto en la web publicada (sí se ve en local para trabajar en él).
   playground: false,
 };
