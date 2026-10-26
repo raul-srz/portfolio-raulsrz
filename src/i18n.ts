@@ -4,7 +4,7 @@ export const langs: Lang[] = ['en', 'es'];
 export const ui = {
   en: {
     metaDescription:
-      'Raúl Suárez, creative director from Gran Canaria. AI films, commercials and motion design.',
+      'Raúl Suárez, creative director from Gran Canaria. Film, documentary, commercials and title sequences, with AI as part of the toolkit.',
     work: 'Work',
     about: 'About',
     menu: 'Menu',
@@ -48,11 +48,12 @@ export const ui = {
     view: 'View',
     ucTitle: 'New site in progress',
     ucText: 'Meanwhile, say hi',
-    cats: { ai: 'AI Film', commercial: 'Commercial', motion: 'Motion' },
+    aiTag: 'AI',
+    cats: { film: 'Film', documentary: 'Documentary', commercial: 'Commercial', titles: 'Titles' },
   },
   es: {
     metaDescription:
-      'Raúl Suárez, director creativo desde Gran Canaria. AI films, publicidad y motion design.',
+      'Raúl Suárez, director creativo desde Gran Canaria. Ficción, documental, publicidad y cabeceras, con la IA como herramienta.',
     work: 'Trabajo',
     about: 'Sobre mí',
     menu: 'Menú',
@@ -96,7 +97,8 @@ export const ui = {
     view: 'Ver',
     ucTitle: 'Web nueva en camino',
     ucText: 'Mientras tanto, escríbeme',
-    cats: { ai: 'AI Film', commercial: 'Commercial', motion: 'Motion' },
+    aiTag: 'IA',
+    cats: { film: 'Ficción', documentary: 'Documental', commercial: 'Publicidad', titles: 'Cabeceras' },
   },
 } as const;
 

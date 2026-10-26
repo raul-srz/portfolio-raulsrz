@@ -3,7 +3,7 @@ import Base from '../layouts/Base.astro';
 import Media from '../components/Media.astro';
 import Arrow from '../components/Arrow.astro';
 import { ui, href, type Lang } from '../i18n';
-import { getProjects, type Project } from '../lib/projects';
+import { getProjects, labelFor, type Project } from '../lib/projects';
 
 interface Props { lang: Lang; project: Project }
 const { lang, project } = Astro.props;
@@ -12,7 +12,7 @@ const d = project.data;
 const all = await getProjects();
 const idx = all.findIndex((p) => p.id === project.id);
 const next = all[(idx + 1) % all.length];
-const cats = d.categories.map((c) => t.cats[c]).join(' · ');
+const cats = labelFor(project, t);
 const stills = d.stills.length ? d.stills : ['', '', '', ''];
 ---
 <Base lang={lang} title={d.title} description={d.about[lang]}>
@@ -34,7 +34,7 @@ const stills = d.stills.length ? d.stills : ['', '', '', ''];
     <dl class="meta">
       <div><dt class="lbl">{t.role}</dt><dd>{d.role[lang]}</dd></div>
       <div><dt class="lbl">{t.type}</dt><dd>{d.type[lang]}</dd></div>
-      <div><dt class="lbl">{t.year}</dt><dd>{d.year}</dd></div>
+      {d.year && <div><dt class="lbl">{t.year}</dt><dd>{d.year}</dd></div>}
       {d.client && <div><dt class="lbl">{t.client}</dt><dd>{d.client}</dd></div>}
     </dl>
   </section>

@@ -7,9 +7,10 @@ const projects = defineCollection({
   loader: glob({ pattern: '**/*.md', base: './src/content/projects' }),
   schema: z.object({
     title: z.string(),
-    categories: z.array(z.enum(['ai', 'commercial', 'motion'])).min(1),
-    year: z.number(),
-    order: z.number().default(100), // menor = antes, dentro del mismo año
+    categories: z.array(z.enum(['film', 'documentary', 'commercial', 'titles'])).min(1),
+    ai: z.boolean().default(false), // muestra la etiqueta AI / IA
+    year: z.number().optional(),
+    order: z.number().default(100), // orden en Work: menor = antes
     featured: z.number().optional(), // 1, 2, 3 = posición en "Selected work" de la home
     role: bi,
     type: bi,

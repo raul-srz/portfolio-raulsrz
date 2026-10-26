@@ -26,7 +26,7 @@ export const site = {
   reel: '',
 
   // About: listas editables. Vacías = la fila no se muestra.
-  collaborations: ['Client A', 'Client B', 'Client C', 'Client D', 'Client E', 'Client F'],
+  collaborations: ['Atresplayer', 'Videoreport', '22 Grados', 'FUGU', 'Granca', 'Firgas', 'MUBEA', 'Carnaval de Las Palmas', 'Disantino', 'The One', 'Deleito', 'DLATEC'],
   awards: [
     { title: 'Festival name (City, Country)', detail: 'Month Year · Project · Official Selection' },
     { title: 'Festival name (City, Country)', detail: 'Month Year · Project · Award' },

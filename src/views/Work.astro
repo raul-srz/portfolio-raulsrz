@@ -3,15 +3,15 @@ import Base from '../layouts/Base.astro';
 import Media from '../components/Media.astro';
 import Arrow from '../components/Arrow.astro';
 import { ui, href, type Lang } from '../i18n';
-import { getProjects } from '../lib/projects';
+import { getProjects, labelFor } from '../lib/projects';
 
 interface Props { lang: Lang }
 const { lang } = Astro.props;
 const t = ui[lang];
 const projects = await getProjects();
-const cats = ['ai', 'commercial', 'motion'] as const;
+const cats = ['film', 'documentary', 'commercial', 'titles'] as const;
 const count = (c: string) => projects.filter((p) => (p.data.categories as string[]).includes(c)).length;
-const years = [...new Set(projects.map((p) => p.data.year))];
+const years = [...new Set(projects.map((p) => p.data.year).filter(Boolean))].sort((a, b) => b! - a!);
 ---
 <Base lang={lang} title={t.work}>
   <div class="work" data-work>
@@ -29,9 +29,11 @@ const years = [...new Set(projects.map((p) => p.data.year))];
       </div>
     </div>
 
-    <ol class="years small" data-years aria-hidden="true">
-      {years.map((y) => <li data-year={y}>{y}</li>)}
-    </ol>
+    {years.length > 1 && (
+      <ol class="years small" data-years aria-hidden="true">
+        {years.map((y) => <li data-year={y}>{y}</li>)}
+      </ol>
+    )}
 
     <div class="grid wrap" data-grid>
       {projects.map((p, i) => (
@@ -39,7 +41,7 @@ const years = [...new Set(projects.map((p) => p.data.year))];
           <Media seed={p.id} loop={p.data.loop} poster={p.data.poster} play="hover" label={p.data.title} />
           <span class="card-info">
             <span>{p.data.title}</span>
-            <span class="small muted">{p.data.year}</span>
+            <span class="small muted">{labelFor(p, t)}</span>
           </span>
         </a>
       ))}
@@ -50,8 +52,8 @@ const years = [...new Set(projects.map((p) => p.data.year))];
         <li data-cats={p.data.categories.join(' ')}>
           <a class="row" href={href(lang, `/work/${p.id}`)}>
             <span class="row-title">{p.data.title}</span>
-            <span class="row-cat small muted">{p.data.categories.map((c) => t.cats[c]).join(' · ')}</span>
-            <span class="row-year small muted">{p.data.year}</span>
+            <span class="row-cat small muted">{labelFor(p, t)}</span>
+            <span class="row-year small muted">{p.data.year ?? ''}</span>
             <Arrow />
           </a>
         </li>
@@ -64,7 +66,7 @@ const years = [...new Set(projects.map((p) => p.data.year))];
   .top { padding-top: clamp(100px, 12vw, 160px); display: flex; justify-content: space-between; align-items: flex-end; gap: 24px; flex-wrap: wrap; }
   .filters, .views { display: flex; flex-wrap: wrap; gap: clamp(12px, 2vw, 30px); }
   .filters button, .views button {
-    font-size: clamp(30px, 4.8vw, 72px); font-weight: 400; letter-spacing: -0.04em; line-height: 1;
+    font-size: clamp(26px, 3.2vw, 60px); font-weight: 400; letter-spacing: -0.035em; line-height: 1.05;
     color: var(--dim); transition: color 0.3s;
   }
   .filters button:hover, .views button:hover { color: var(--muted); }

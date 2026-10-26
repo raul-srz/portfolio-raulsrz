@@ -121,7 +121,8 @@ if (work) {
       const isList = b.dataset.view === 'list';
       list.hidden = !isList;
       grid.hidden = isList;
-      $('[data-years]', work)!.hidden = isList;
+      const yrs = $('[data-years]', work);
+      if (yrs) yrs.hidden = isList;
     }),
   );
 }

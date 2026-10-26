@@ -4,7 +4,7 @@ import Media from '../components/Media.astro';
 import Arrow from '../components/Arrow.astro';
 import { site } from '../site';
 import { ui, href, type Lang } from '../i18n';
-import { getFeatured } from '../lib/projects';
+import { getFeatured, labelFor } from '../lib/projects';
 
 interface Props { lang: Lang }
 const { lang } = Astro.props;
@@ -49,7 +49,7 @@ const words = t.statement.split(' ');
                 <Media seed={p.id} loop={p.data.loop} poster={p.data.poster} play="hover" label={p.data.title} eager={i === 0} />
                 <div class="slide-over blend">
                   <h3>{p.data.title}</h3>
-                  <span class="small">{p.data.categories.map((c) => t.cats[c]).join(' · ')}</span>
+                  <span class="small">{labelFor(p, t)}</span>
                 </div>
               </a>
             ))}
